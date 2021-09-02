@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -11,10 +12,17 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
+  late TextEditingController _emailTextController =
+      TextEditingController(text: '');
+  late TextEditingController _passTextController =
+      TextEditingController(text: '');
+  bool _obscureText = true;
 
   @override
   void dispose() {
     _animationController.dispose();
+    _emailTextController.dispose();
+    _passTextController.dispose();
     super.dispose();
   }
 
@@ -48,7 +56,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
         children: [
           CachedNetworkImage(
             imageUrl:
-                "https://images.pexels.com/photos/273238/pexels-photo-273238.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+                "https://images.pexels.com/photos/163143/sackcloth-sackcloth-textured-laptop-ipad-163143.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
             placeholder: (context, url) => Image.asset(
               'assets/images/wallpaper.jpg',
             ),
@@ -71,7 +79,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                   'Login',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade700,
+                      color: Colors.white,
                       fontSize: 35),
                 ),
                 SizedBox(height: 10),
@@ -81,16 +89,18 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                       TextSpan(
                         text: 'No tienes cuenta ',
                         style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16),
                       ),
                       TextSpan(text: '  '),
                       TextSpan(
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => print('Para registrase!'),
                         text: 'Registrate! ',
                         style: TextStyle(
                             decoration: TextDecoration.underline,
-                            color: Colors.blue.shade500,
+                            color: Colors.blue.shade200,
                             fontWeight: FontWeight.bold,
                             fontSize: 16),
                       ),
@@ -98,9 +108,11 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                   ),
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 40,
                 ),
                 TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailTextController,
                   validator: (value) {
                     if (value!.isEmpty || !value.contains('@')) {
                       return 'Por favor ingrese un correo valido';
@@ -110,8 +122,107 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                   },
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
+                      hintText: 'Email',
+                      hintStyle: TextStyle(color: Colors.white),
                       enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white))),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      errorBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      )),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
+                  obscureText: _obscureText,
+                  keyboardType: TextInputType.visiblePassword,
+                  controller: _passTextController,
+                  validator: (value) {
+                    if (value!.isEmpty || value.length < 7) {
+                      return 'Por favor ingrese una contraseña valida';
+                    } else {
+                      return null;
+                    }
+                  },
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                        child: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white,
+                        ),
+                      ),
+                      hintText: 'Password',
+                      hintStyle: TextStyle(color: Colors.white),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      errorBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      )),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Recuperar Contraseña',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
+                          fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 40,
+                ),
+                MaterialButton(
+                  color: Colors.green.shade300,
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  onPressed: () {},
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Login',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          width: 12,
+                        ),
+                        Icon(
+                          Icons.login,
+                          color: Colors.white,
+                        )
+                      ],
+                    ),
+                  ),
                 )
               ],
             ),
