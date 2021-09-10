@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase_app_workos/login.dart';
+import 'package:flutter_firebase_app_workos/screen/auth/login.dart';
 
 void main() {
   runApp(MyApp());

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_app_workos/screen/auth/register.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -17,6 +18,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
   late TextEditingController _passTextController =
       TextEditingController(text: '');
   bool _obscureText = true;
+  final _loginFromKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -46,6 +48,12 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
     _animationController.forward();
 
     super.initState();
+  }
+
+  void _submitFormOnLogin() {
+    final isValid = _loginFromKey.currentState!.validate();
+    // print(':Es Valido $isValid');
+    if (isValid) {}
   }
 
   @override
@@ -96,7 +104,10 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                       TextSpan(text: '  '),
                       TextSpan(
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () => print('Para registrase!'),
+                          ..onTap = () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignUp())),
                         text: 'Registrate! ',
                         style: TextStyle(
                             decoration: TextDecoration.underline,
@@ -110,70 +121,79 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                 SizedBox(
                   height: 40,
                 ),
-                TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _emailTextController,
-                  validator: (value) {
-                    if (value!.isEmpty || !value.contains('@')) {
-                      return 'Por favor ingrese un correo valido';
-                    } else {
-                      return null;
-                    }
-                  },
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                      hintText: 'Email',
-                      hintStyle: TextStyle(color: Colors.white),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      errorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      )),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                  obscureText: _obscureText,
-                  keyboardType: TextInputType.visiblePassword,
-                  controller: _passTextController,
-                  validator: (value) {
-                    if (value!.isEmpty || value.length < 7) {
-                      return 'Por favor ingrese una contraseña valida';
-                    } else {
-                      return null;
-                    }
-                  },
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _obscureText = !_obscureText;
-                          });
+                Form(
+                  key: _loginFromKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        controller: _emailTextController,
+                        validator: (value) {
+                          if (value!.isEmpty || !value.contains('@')) {
+                            return 'Por favor ingrese un correo valido';
+                          } else {
+                            return null;
+                          }
                         },
-                        child: Icon(
-                          _obscureText
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                            hintText: 'Email',
+                            hintStyle: TextStyle(color: Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.red.shade300),
+                            )),
                       ),
-                      hintText: 'Password',
-                      hintStyle: TextStyle(color: Colors.white),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                      SizedBox(
+                        height: 20,
                       ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                      TextFormField(
+                        obscureText: _obscureText,
+                        keyboardType: TextInputType.visiblePassword,
+                        controller: _passTextController,
+                        validator: (value) {
+                          if (value!.isEmpty || value.length < 7) {
+                            return 'Por favor ingrese una contraseña valida';
+                          } else {
+                            return null;
+                          }
+                        },
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                              child: Icon(
+                                _obscureText
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.white,
+                              ),
+                            ),
+                            hintText: 'Password',
+                            hintStyle: TextStyle(color: Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.red.shade300),
+                            )),
                       ),
-                      errorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
-                      )),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: 15,
@@ -200,7 +220,9 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                   elevation: 8,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
-                  onPressed: () {},
+                  onPressed: () {
+                    _submitFormOnLogin();
+                  },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Row(
