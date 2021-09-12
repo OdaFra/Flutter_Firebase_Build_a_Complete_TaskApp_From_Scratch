@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 
 class TareasWidgets extends StatefulWidget {
   @override
@@ -6,6 +7,7 @@ class TareasWidgets extends StatefulWidget {
 }
 
 class _TareasWidgetsState extends State<TareasWidgets> {
+  Constants _constants = Constants();
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -31,10 +33,11 @@ class _TareasWidgetsState extends State<TareasWidgets> {
           ),
         ),
         title: Text(
-          'Title',
+          'Titulo',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: _constants.darkBlue),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

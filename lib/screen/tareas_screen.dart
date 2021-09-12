@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_app_workos/screen/widgets/drawer_widgets.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/tareas_widgets.dart';
 
 class TareasScreen extends StatefulWidget {
@@ -21,7 +22,7 @@ class _TareasScreenState extends State<TareasScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      drawer: Drawer(),
+      drawer: DrawerWidgets(),
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.black45),
         // leading: Builder(builder: (ctx) {
