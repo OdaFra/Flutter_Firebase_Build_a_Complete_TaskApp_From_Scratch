@@ -7,7 +7,6 @@ class TareasWidgets extends StatefulWidget {
 }
 
 class _TareasWidgetsState extends State<TareasWidgets> {
-  Constants _constants = Constants();
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -36,8 +35,8 @@ class _TareasWidgetsState extends State<TareasWidgets> {
           'Titulo',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              fontWeight: FontWeight.bold, color: _constants.darkBlue),
+          style:
+              TextStyle(fontWeight: FontWeight.bold, color: Constants.darkBlue),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

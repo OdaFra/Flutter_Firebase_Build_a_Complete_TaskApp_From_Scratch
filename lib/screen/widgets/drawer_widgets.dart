@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
+import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
 import 'package:flutter_firebase_app_workos/screen/views/crear_tareas.dart';
 
 class DrawerWidgets extends StatefulWidget {
@@ -8,8 +9,6 @@ class DrawerWidgets extends StatefulWidget {
 }
 
 class _DrawerWidgetsState extends State<DrawerWidgets> {
-  Constants _constants = Constants();
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -33,7 +32,7 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
                     child: Text(
                       'Work Os',
                       style: TextStyle(
-                        color: _constants.darkBlue,
+                        color: Constants.darkBlue,
                         fontSize: 22,
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.bold,
@@ -45,7 +44,12 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
           SizedBox(
             height: 15,
           ),
-          _listTiles(label: 'Todas las tareas', fct: () {}, icon: Icons.task),
+          _listTiles(
+              label: 'Todas las tareas',
+              fct: () {
+                _navigatorTodasTareas(context);
+              },
+              icon: Icons.task),
           _listTiles(label: 'Mi cuenta', fct: () {}, icon: Icons.settings),
           _listTiles(
               label: 'Registrar trabajos', fct: () {}, icon: Icons.workspaces),
@@ -99,7 +103,7 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
             content: Text(
               'Quieres cerrar sesión?',
               style: TextStyle(
-                color: _constants.darkBlue,
+                color: Constants.darkBlue,
                 fontSize: 15,
                 fontStyle: FontStyle.italic,
               ),
@@ -131,6 +135,11 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
         });
   }
 
+  void _navigatorTodasTareas(context) {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => TareasScreen()));
+  }
+
   void _navigatorCrearTareas() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => CrearTareas()));
@@ -142,11 +151,11 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
       onTap: () {
         fct();
       },
-      leading: Icon(icon, size: 25, color: _constants.darkBlue),
+      leading: Icon(icon, size: 25, color: Constants.darkBlue),
       title: Text(
         label,
         style: TextStyle(
-          color: _constants.darkBlue,
+          color: Constants.darkBlue,
           fontSize: 15,
           fontStyle: FontStyle.normal,
         ),

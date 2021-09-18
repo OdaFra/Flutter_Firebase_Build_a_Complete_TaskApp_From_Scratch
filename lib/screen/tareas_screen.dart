@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/drawer_widgets.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/tareas_widgets.dart';
 
@@ -8,16 +9,6 @@ class TareasScreen extends StatefulWidget {
 }
 
 class _TareasScreenState extends State<TareasScreen> {
-  List<String> CategoriaTareas = [
-    'Comercial',
-    'Desarrollo',
-    'Ingenieria',
-    'Recursos Humanos',
-    'Marketing',
-    'Diseño',
-    'Atención al cliente'
-  ];
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -74,11 +65,14 @@ class _TareasScreenState extends State<TareasScreen> {
             content: Container(
               width: size.width * 0.8,
               child: ListView.builder(
-                  itemCount: CategoriaTareas.length,
+                  itemCount: Constants.CategoriaTareas.length,
                   shrinkWrap: true,
                   itemBuilder: (ctxx, index) {
                     return InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        print(
+                            'Constants.CategoriaTareas[index] ${Constants.CategoriaTareas[index]}');
+                      },
                       child: Row(
                         children: [
                           Icon(
@@ -91,9 +85,11 @@ class _TareasScreenState extends State<TareasScreen> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              CategoriaTareas[index],
+                              Constants.CategoriaTareas[index],
                               style: TextStyle(
-                                  fontSize: 18, fontStyle: FontStyle.italic),
+                                  color: Constants.darkBlue,
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.italic),
                             ),
                           )
                         ],
