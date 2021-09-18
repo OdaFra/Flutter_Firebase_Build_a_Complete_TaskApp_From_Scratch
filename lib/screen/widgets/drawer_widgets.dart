@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
+import 'package:flutter_firebase_app_workos/screen/todos_colaboradores.dart';
 import 'package:flutter_firebase_app_workos/screen/views/crear_tareas.dart';
+import 'package:flutter_firebase_app_workos/screen/views/perfil.dart';
 
 class DrawerWidgets extends StatefulWidget {
   @override
@@ -50,9 +52,18 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
                 _navigatorTodasTareas(context);
               },
               icon: Icons.task),
-          _listTiles(label: 'Mi cuenta', fct: () {}, icon: Icons.settings),
           _listTiles(
-              label: 'Registrar trabajos', fct: () {}, icon: Icons.workspaces),
+              label: 'Mi cuenta',
+              fct: () {
+                _navigatorPerfil(context);
+              },
+              icon: Icons.settings),
+          _listTiles(
+              label: 'Registrar Colaborador',
+              fct: () {
+                _navigatorColaboradores(context);
+              },
+              icon: Icons.workspaces),
           _listTiles(
               label: 'Agregar tareas',
               fct: () {
@@ -133,6 +144,16 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
             ],
           );
         });
+  }
+
+  void _navigatorPerfil(context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PerfilViews()));
+  }
+
+  void _navigatorColaboradores(context) {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => TodosColaboradores()));
   }
 
   void _navigatorTodasTareas(context) {

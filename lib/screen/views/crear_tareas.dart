@@ -16,6 +16,8 @@ class _CrearTareasState extends State<CrearTareas> {
       TextEditingController(text: 'Elija una fecha');
   final _fromKey = GlobalKey<FormState>();
 
+  DateTime? picked;
+
   @override
   void dispose() {
     super.dispose();
@@ -111,7 +113,9 @@ class _CrearTareasState extends State<CrearTareas> {
                             valueKey: 'fechatareas',
                             controller: _fechaTareaController,
                             enabled: false,
-                            fct: () {},
+                            fct: () {
+                              _pickDateDialog();
+                            },
                             maxLength: 100)
                       ],
                     ),
@@ -207,6 +211,25 @@ class _CrearTareasState extends State<CrearTareas> {
         ),
       ),
     );
+  }
+
+  void _pickDateDialog() async {
+    picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(
+        Duration(days: 10),
+      ),
+      lastDate: DateTime(2100),
+    );
+    print('La fecha es: $picked');
+
+    if (picked != null) {
+      setState(() {
+        _fechaTareaController.text =
+            '${picked!.day}-${picked!.month}-${picked!.year}';
+      });
+    }
   }
 
   Widget _textField({
