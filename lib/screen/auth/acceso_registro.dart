@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
 
 class SignUp extends StatefulWidget {
@@ -21,13 +24,18 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
       TextEditingController(text: '');
   late TextEditingController _positionCPTextController =
       TextEditingController(text: '');
+  late TextEditingController _numeroContactoController =
+      TextEditingController(text: '');
 
   FocusNode _emailfocusNode = FocusNode();
   FocusNode _passfocusNode = FocusNode();
   FocusNode _positionfocusNode = FocusNode();
+  FocusNode _numeroContactofocusNode = FocusNode();
 
   bool _obscureText = true;
   final _signUpFromKey = GlobalKey<FormState>();
+
+  File? imageFiel;
 
   @override
   void dispose() {
@@ -36,9 +44,11 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     _emailTextController.dispose();
     _passTextController.dispose();
     _positionCPTextController.dispose();
+    _numeroContactoController.dispose();
     _emailfocusNode.dispose();
     _passfocusNode.dispose();
     _positionfocusNode.dispose();
+    _numeroContactofocusNode.dispose();
     super.dispose();
   }
 
@@ -139,32 +149,93 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                   child: Column(
                     children: [
                       //Full name
-                      TextFormField(
-                        textInputAction: TextInputAction.next,
-                        onEditingComplete: () => FocusScope.of(context)
-                            .requestFocus(_emailfocusNode),
-                        keyboardType: TextInputType.name,
-                        controller: _fullnameTextController,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Por favor ingrese su nombre';
-                          } else {
-                            return null;
-                          }
-                        },
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                            hintText: 'Nombre',
-                            hintStyle: TextStyle(color: Colors.white),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                      Row(
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: TextFormField(
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(_emailfocusNode),
+                              keyboardType: TextInputType.name,
+                              controller: _fullnameTextController,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Por favor ingrese su nombre';
+                                } else {
+                                  return null;
+                                }
+                              },
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                  hintText: 'Nombre',
+                                  hintStyle: TextStyle(color: Colors.white),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
+                                  errorBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                  )),
                             ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            errorBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            )),
+                          ),
+                          Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Container(
+                                  width: size.width * 0.30,
+                                  height: size.height * 0.15,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1, color: Colors.transparent),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: imageFiel == null
+                                        ? Image.network(
+                                            'https://cdn-icons-png.flaticon.com/512/149/149071.png',
+                                            fit: BoxFit.fill)
+                                        : Image.file(
+                                            imageFiel!,
+                                            fit: BoxFit.fill,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: InkWell(
+                                  onTap: () {
+                                    print('Show imagen picker dialog');
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.shade400,
+                                      border: Border.all(
+                                          width: 2, color: Colors.white),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        imageFiel == null
+                                            ? Icons.add_a_photo
+                                            : Icons.edit_outlined,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
                       ),
                       SizedBox(
                         height: 20,
@@ -205,7 +276,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                       TextFormField(
                         textInputAction: TextInputAction.next,
                         onEditingComplete: () => FocusScope.of(context)
-                            .requestFocus(_positionfocusNode),
+                            .requestFocus(_numeroContactofocusNode),
                         focusNode: _passfocusNode,
                         obscureText: _obscureText,
                         keyboardType: TextInputType.visiblePassword,
@@ -247,24 +318,28 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                       SizedBox(
                         height: 20,
                       ),
-
-                      //Email
+                      //Numero de telefono
                       TextFormField(
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _submitFormOnSignUp(),
-                        focusNode: _positionfocusNode,
-                        keyboardType: TextInputType.name,
-                        controller: _positionCPTextController,
+                        focusNode: _numeroContactofocusNode,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () => FocusScope.of(context)
+                            .requestFocus(_positionfocusNode),
+                        keyboardType: TextInputType.phone,
+                        controller: _numeroContactoController,
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'Por favor ingrese una posicion';
+                            return 'Por favor ingrese su nombre';
                           } else {
                             return null;
                           }
                         },
+                        onChanged: (v) {
+                          print(
+                              'Numero de Telefono: ${_numeroContactoController.text}');
+                        },
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                            hintText: 'Posicion en la compañia',
+                            hintText: 'Numero de contacto',
                             hintStyle: TextStyle(color: Colors.white),
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
@@ -275,6 +350,48 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                             errorBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
                             )),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+
+                      //Position
+                      GestureDetector(
+                        onTap: () {
+                          _MostrarCategoriaTareas(size: size);
+                        },
+                        child: TextFormField(
+                          enabled: false,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _submitFormOnSignUp(),
+                          focusNode: _positionfocusNode,
+                          keyboardType: TextInputType.name,
+                          controller: _positionCPTextController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Por favor ingrese una posicion';
+                            } else {
+                              return null;
+                            }
+                          },
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: 'Posicion en la compañia',
+                            hintStyle: TextStyle(color: Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            errorBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            disabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -326,5 +443,72 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
         ],
       ),
     );
+  }
+
+  _MostrarCategoriaTareas({required Size size}) {
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text(
+              'Escoge una posición',
+              style: TextStyle(fontSize: 20, color: Colors.green.shade500),
+            ),
+            content: Container(
+              width: size.width * 0.8,
+              child: ListView.builder(
+                  itemCount: Constants.listaTrabajos.length,
+                  shrinkWrap: true,
+                  itemBuilder: (ctxx, index) {
+                    return InkWell(
+                      onTap: () {
+                        // print(
+                        //     'Constants.CategoriaTareas[index] ${Constants.CategoriaTareas[index]}');
+                        setState(() {
+                          _positionCPTextController.text =
+                              Constants.listaTrabajos[index];
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.work_outline,
+                            color: Colors.green.shade500,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              Constants.listaTrabajos[index],
+                              style: TextStyle(
+                                  color: Constants.darkBlue,
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.italic),
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  }),
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.canPop(context)
+                            ? Navigator.pop(context)
+                            : null;
+                      },
+                      child: Text('Cerrar')),
+                ],
+              )
+            ],
+          );
+        });
   }
 }

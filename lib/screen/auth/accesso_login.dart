@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/auth/recuperar_pass.dart';
-import 'package:flutter_firebase_app_workos/screen/auth/registro.dart';
+import 'package:flutter_firebase_app_workos/screen/auth/acceso_registro.dart';
 import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
 
 class Login extends StatefulWidget {

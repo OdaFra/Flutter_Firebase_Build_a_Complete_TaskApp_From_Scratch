@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase_app_workos/screen/auth/registro.dart';
+import 'package:flutter_firebase_app_workos/screen/auth/acceso_registro.dart';
 
 class RecuperarPass extends StatefulWidget {
   RecuperarPass({Key? key}) : super(key: key);
