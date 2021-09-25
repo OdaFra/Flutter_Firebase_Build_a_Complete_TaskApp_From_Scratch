@@ -15,7 +15,7 @@ class _TareasWidgetsState extends State<TareasWidgets> {
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
         onTap: () {
-          Navigator.pushReplacement(context,
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => DetallesTareasView()));
         },
         onLongPress: () => _eliminarDialog(),

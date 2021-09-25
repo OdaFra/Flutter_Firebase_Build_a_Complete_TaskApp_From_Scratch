@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 
 class DetallesTareasView extends StatefulWidget {
@@ -8,15 +9,17 @@ class DetallesTareasView extends StatefulWidget {
 
 class _DetallesTareasViewState extends State<DetallesTareasView> {
   var _textStyle = TextStyle(
-    color: Constants.darkBlue,
-    fontSize: 15,
-    fontWeight: FontWeight.normal,
-  );
+      color: Constants.darkBlue, fontSize: 15, fontWeight: FontWeight.normal);
   var _tituloStyle = TextStyle(
       color: Colors.green.shade400, fontWeight: FontWeight.bold, fontSize: 15);
 
   var _titStyle = TextStyle(
       color: Constants.darkBlue, fontWeight: FontWeight.bold, fontSize: 15);
+
+  TextEditingController _comentarioController = TextEditingController();
+
+  bool _isComentario = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,25 +179,107 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                       SizedBox(
                         height: 20,
                       ),
-                      Center(
-                        child: MaterialButton(
-                          color: Colors.green.shade300,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          onPressed: () {},
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            child: Text(
-                              'Agregar Comentarios',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12),
-                            ),
-                          ),
+                      AnimatedSwitcher(
+                        duration: Duration(
+                          milliseconds: 500,
                         ),
+                        child: _isComentario
+                            ? Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Flexible(
+                                    flex: 3,
+                                    child: TextField(
+                                      controller: _comentarioController,
+                                      style: TextStyle(
+                                        color: Constants.darkBlue,
+                                      ),
+                                      maxLength: 200,
+                                      keyboardType: TextInputType.text,
+                                      maxLines: 6,
+                                      decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide:
+                                                BorderSide(color: Colors.white),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.green.shade400),
+                                          )),
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                        ),
+                                        child: MaterialButton(
+                                          color: Colors.green.shade300,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          onPressed: () {},
+                                          child: Text(
+                                            'Post',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12),
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _isComentario = !_isComentario;
+                                            });
+                                          },
+                                          child: Text('Cancelar'))
+                                    ],
+                                  ))
+                                ],
+                              )
+                            : Center(
+                                child: MaterialButton(
+                                  color: Colors.green.shade300,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isComentario = !_isComentario;
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    child: Text(
+                                      'Agregar Comentarios',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              ),
                       ),
+                      ListView.separated(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Text('Datos');
+                          },
+                          separatorBuilder: (context, index) {
+                            return Divider(thickness: 1);
+                          },
+                          itemCount: 15)
                     ],
                   ),
                 ),
