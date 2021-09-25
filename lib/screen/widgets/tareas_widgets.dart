@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
+import 'package:flutter_firebase_app_workos/screen/views/detalles_tareas.dart';
 
 class TareasWidgets extends StatefulWidget {
   @override
@@ -13,7 +14,10 @@ class _TareasWidgetsState extends State<TareasWidgets> {
       elevation: 8,
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
-        onTap: () {},
+        onTap: () {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => DetallesTareasView()));
+        },
         onLongPress: () => _eliminarDialog(),
         contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         leading: Container(

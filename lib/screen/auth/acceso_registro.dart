@@ -5,6 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class SignUp extends StatefulWidget {
   SignUp({Key? key}) : super(key: key);
@@ -35,7 +37,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
   bool _obscureText = true;
   final _signUpFromKey = GlobalKey<FormState>();
 
-  File? imageFiel;
+  File? imageFile;
 
   @override
   void dispose() {
@@ -195,12 +197,12 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
-                                    child: imageFiel == null
+                                    child: imageFile == null
                                         ? Image.network(
                                             'https://cdn-icons-png.flaticon.com/512/149/149071.png',
                                             fit: BoxFit.fill)
                                         : Image.file(
-                                            imageFiel!,
+                                            imageFile!,
                                             fit: BoxFit.fill,
                                           ),
                                   ),
@@ -211,7 +213,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                                 right: 0,
                                 child: InkWell(
                                   onTap: () {
-                                    print('Show imagen picker dialog');
+                                    _MostrarImageDialog();
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -223,7 +225,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Icon(
-                                        imageFiel == null
+                                        imageFile == null
                                             ? Icons.add_a_photo
                                             : Icons.edit_outlined,
                                         color: Colors.white,
@@ -445,7 +447,101 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     );
   }
 
-  _MostrarCategoriaTareas({required Size size}) {
+  void _MostrarImageDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Por favor elija una opción'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: () {
+                    _obtenerFoto();
+                  },
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Icon(Icons.camera, color: Colors.green.shade400),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Camara',
+                          style: TextStyle(color: Colors.green.shade400),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    _obtenerGalleria();
+                  },
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Icon(Icons.image, color: Colors.green.shade400),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Galeria',
+                          style: TextStyle(color: Colors.green.shade400),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _obtenerGalleria() async {
+    PickedFile? pickedFile = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+    // setState(() {
+    //   imageFile = File(pickedFile!.path);
+    // });
+    _cropImage(pickedFile!.path);
+    Navigator.pop(context);
+  }
+
+  void _obtenerFoto() async {
+    PickedFile? pickedFile = await ImagePicker().getImage(
+      source: ImageSource.camera,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+    // setState(() {
+    //   imageFile = File(pickedFile!.path);
+    // });
+    _cropImage(pickedFile!.path);
+    Navigator.pop(context);
+  }
+
+  void _cropImage(filePath) async {
+    File? croppedImage = await ImageCropper.cropImage(
+      sourcePath: filePath,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+    if (croppedImage != null) {
+      setState(() {
+        imageFile = croppedImage;
+      });
+    }
+  }
+
+  void _MostrarCategoriaTareas({required Size size}) {
     showDialog(
         context: context,
         builder: (ctx) {
