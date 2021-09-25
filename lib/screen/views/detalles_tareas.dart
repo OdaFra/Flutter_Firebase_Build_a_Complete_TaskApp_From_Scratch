@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
+import 'package:flutter_firebase_app_workos/screen/widgets/comentarios.dart';
 
 class DetallesTareasView extends StatefulWidget {
   @override
@@ -274,7 +275,7 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            return Text('Datos');
+                            return ComentariosViews();
                           },
                           separatorBuilder: (context, index) {
                             return Divider(thickness: 1);
