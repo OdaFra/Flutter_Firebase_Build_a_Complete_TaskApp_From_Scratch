@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/drawer_widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PerfilViews extends StatefulWidget {
   @override
@@ -108,15 +110,21 @@ class _PerfilViewsState extends State<PerfilViews> {
                       children: [
                         _contact(
                             color: Colors.green,
-                            fct: () {},
-                            icon: Icons.message_outlined),
+                            fct: () {
+                              _openWhatsapp();
+                            },
+                            icon: FontAwesome.whatsapp),
                         _contact(
                             color: Colors.orange,
-                            fct: () {},
+                            fct: () {
+                              _mailto();
+                            },
                             icon: Icons.email_outlined),
                         _contact(
                             color: Colors.blue,
-                            fct: () {},
+                            fct: () {
+                              _llamadaNumeroContacto();
+                            },
                             icon: Icons.call_outlined),
                       ],
                     ),
@@ -192,6 +200,42 @@ class _PerfilViewsState extends State<PerfilViews> {
         ),
       ),
     );
+  }
+
+// Para Whatsapp
+  void _openWhatsapp() async {
+    String phone = '+595981888825';
+    var url = 'https://wa.me/$phone?text=HolaMundo';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      print('Error');
+      throw 'Ah ocurrido un error';
+    }
+  }
+
+// Para enviar Correo
+  void _mailto() async {
+    String email = 'networkernel@gmail.com';
+    var emailurl = 'mailto:$email';
+    if (await canLaunch(emailurl)) {
+      await launch(emailurl);
+    } else {
+      print('Error');
+      throw 'Ah ocurrido un error';
+    }
+  }
+
+  //Para llamar o contactar
+  void _llamadaNumeroContacto() async {
+    String phoneNumber = '+595981888825';
+    var contacturl = 'tel://$phoneNumber';
+    if (await canLaunch(contacturl)) {
+      await launch(contacturl);
+    } else {
+      print('Error');
+      throw 'Ah ocurrido un error';
+    }
   }
 
   Widget _contact(

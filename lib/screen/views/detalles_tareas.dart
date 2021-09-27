@@ -25,6 +25,8 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        iconTheme: IconThemeData(color: Colors.black),
         elevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: TextButton(
@@ -178,7 +180,7 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                       Text('Detalle Tarea :', style: _titStyle),
                       Text('Descripcion : ', style: _textStyle),
                       SizedBox(
-                        height: 20,
+                        height: 40,
                       ),
                       AnimatedSwitcher(
                         duration: Duration(
@@ -271,6 +273,7 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                                 ),
                               ),
                       ),
+                      SizedBox(height: 40),
                       ListView.separated(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),

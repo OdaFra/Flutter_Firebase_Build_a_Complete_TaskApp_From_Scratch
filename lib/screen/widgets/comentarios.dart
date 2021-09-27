@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 
 class ComentariosViews extends StatelessWidget {
+  List<Color> _colors = [
+    Colors.amber,
+    Colors.orange,
+    Colors.pink.shade200,
+    Colors.blue,
+    Colors.cyan,
+    Colors.brown,
+    Colors.deepOrange
+  ];
   @override
   Widget build(BuildContext context) {
+    _colors.shuffle();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -15,7 +25,7 @@ class ComentariosViews extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border.all(
                 width: 2,
-                color: Colors.green.shade400,
+                color: _colors[1],
               ),
               shape: BoxShape.circle,
               image: DecorationImage(
