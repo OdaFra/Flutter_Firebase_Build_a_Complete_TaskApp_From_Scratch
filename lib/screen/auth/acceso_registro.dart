@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
-import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
 import 'package:flutter_firebase_app_workos/services/metodos_globales.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -44,6 +45,8 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool _isLoading = false;
+
+  String? imageUrl;
 
   @override
   void dispose() {
@@ -84,17 +87,44 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
 
   void _submitFormOnSignUp() async {
     final isValid = _signUpFromKey.currentState!.validate();
-    // print(':Es Valido $isValid');
     if (isValid) {
+      if (imageFile == null) {
+        MetodoGlobal.showErrorDialog(
+            error: 'Por favor elige una image', ctx: context);
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
 
       try {
         await _auth.createUserWithEmailAndPassword(
-          email: _emailTextController.text.trim().toLowerCase(),
-          password: _passTextController.text.trim(),
-        );
+            email: _emailTextController.text.trim().toLowerCase(),
+            password: _passTextController.text.trim());
+
+        final User? user = _auth.currentUser;
+        final _uid = user!.uid;
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('usersImages')
+            .child(_uid + '.jpg');
+
+        await ref.putFile(imageFile!);
+
+        imageUrl = await ref.getDownloadURL();
+
+        FirebaseFirestore.instance.collection('users').doc(_uid).set({
+          'id': _uid,
+          'name': _fullnameTextController.text,
+          'email': _emailTextController.text,
+          'userImage': imageUrl,
+          'phoneNumber': _numeroContactoController.text,
+          'posicionCompany': _positionCPTextController.text,
+          'createAT': Timestamp.now(),
+        });
+
+        Navigator.canPop(context) ? Navigator.pop(context) : null;
       } catch (e) {
         setState(() {
           _isLoading = false;
@@ -439,10 +469,6 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(12)),
                         onPressed: () {
                           _submitFormOnSignUp();
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => TareasScreen()));
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 14),

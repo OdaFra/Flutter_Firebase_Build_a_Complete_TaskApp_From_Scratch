@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
 import 'package:flutter_firebase_app_workos/screen/todos_colaboradores.dart';
 import 'package:flutter_firebase_app_workos/screen/views/crear_tareas.dart';
 import 'package:flutter_firebase_app_workos/screen/views/perfil.dart';
+
+import '../../user_state.dart';
 
 class DrawerWidgets extends StatefulWidget {
   @override
@@ -85,6 +88,7 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
   }
 
   void _cerrarSesion(context) {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
     showDialog(
         context: context,
         builder: (context) {
@@ -137,7 +141,16 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
                     width: 8,
                   ),
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _auth.signOut();
+                        Navigator.canPop(context)
+                            ? Navigator.pop(context)
+                            : null;
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => UserState()));
+                      },
                       child: Text('OK', style: TextStyle(color: Colors.red)))
                 ],
               )
@@ -147,8 +160,11 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
   }
 
   void _navigatorPerfil(context) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => PerfilViews()));
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final User? user = _auth.currentUser;
+    final String uid = user!.uid;
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => PerfilViews(userID: uid)));
   }
 
   void _navigatorColaboradores(context) {

@@ -70,9 +70,9 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
 
       try {
         await _auth.signInWithEmailAndPassword(
-          email: _emailTextController.text.trim().toLowerCase(),
-          password: _passTextController.text.trim(),
-        );
+            email: _emailTextController.text.trim().toLowerCase(),
+            password: _passTextController.text.trim());
+        Navigator.canPop(context) ? Navigator.pop(context) : null;
       } catch (e) {
         setState(() {
           _isLoading = false;
@@ -255,11 +255,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   onPressed: () {
-                    // _submitFormOnLogin();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TareasScreen()));
+                    _submitFormOnLogin();
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14),

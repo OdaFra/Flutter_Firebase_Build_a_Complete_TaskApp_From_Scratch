@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase_app_workos/screen/auth/accesso_login.dart';
+import 'package:flutter_firebase_app_workos/user_state.dart';
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
                 scaffoldBackgroundColor: Color(0xffede7dc),
                 primarySwatch: Colors.blue,
               ),
-              home: Login());
+              home: UserState());
         });
   }
 }
