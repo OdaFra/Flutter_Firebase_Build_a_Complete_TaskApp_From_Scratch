@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
+import 'package:flutter_firebase_app_workos/services/metodos_globales.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -38,6 +40,10 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
   final _signUpFromKey = GlobalKey<FormState>();
 
   File? imageFile;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -76,10 +82,27 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     super.initState();
   }
 
-  void _submitFormOnSignUp() {
+  void _submitFormOnSignUp() async {
     final isValid = _signUpFromKey.currentState!.validate();
     // print(':Es Valido $isValid');
-    if (isValid) {}
+    if (isValid) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        await _auth.createUserWithEmailAndPassword(
+          email: _emailTextController.text.trim().toLowerCase(),
+          password: _passTextController.text.trim(),
+        );
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        MetodoGlobal.showErrorDialog(error: e.toString(), ctx: context);
+      }
+    }
+    _isLoading = false;
   }
 
   @override
@@ -401,41 +424,49 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                 SizedBox(
                   height: 40,
                 ),
-                MaterialButton(
-                  color: Colors.green.shade300,
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  onPressed: () {
-                    // _submitFormOnSignUp();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TareasScreen()));
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Crear cuenta',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
+                _isLoading
+                    ? Center(
+                        child: Container(
+                          width: 70,
+                          height: 70,
+                          child: CircularProgressIndicator(),
                         ),
-                        SizedBox(
-                          width: 12,
+                      )
+                    : MaterialButton(
+                        color: Colors.green.shade300,
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        onPressed: () {
+                          _submitFormOnSignUp();
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => TareasScreen()));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Crear cuenta',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20),
+                              ),
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Icon(
+                                Icons.person_add,
+                                color: Colors.white,
+                              )
+                            ],
+                          ),
                         ),
-                        Icon(
-                          Icons.person_add,
-                          color: Colors.white,
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
                 SizedBox(
                   height: 40,
                 ),

@@ -1,22 +1,51 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/auth/accesso_login.dart';
-import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Flutter WorkOs',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          scaffoldBackgroundColor: Color(0xffede7dc),
-          primarySwatch: Colors.blue,
-        ),
-        home: TareasScreen());
+    return FutureBuilder(
+        initialData: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: Scaffold(
+                body: Center(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: Scaffold(
+                body: Center(
+                  child: Center(
+                    child: Text('A ocurrido un error'),
+                  ),
+                ),
+              ),
+            );
+          }
+          return MaterialApp(
+              title: 'App List Note',
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                scaffoldBackgroundColor: Color(0xffede7dc),
+                primarySwatch: Colors.blue,
+              ),
+              home: Login());
+        });
   }
 }

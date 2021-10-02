@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "472776004061",
+    "project_id": "flutterworkos",
+    "storage_bucket": "flutterworkos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472776004061:android:fb20c3e982781d1d662634",
+        "android_client_info": {
+          "package_name": "com.example.flutter_firebase_app_workos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "472776004061-0p7q8vjlbh1qjjueftujds6b502bceb9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdp8P2HRhsLsgkqAxn7ln1RjGwDrRrMMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "472776004061-0p7q8vjlbh1qjjueftujds6b502bceb9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
