@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TodosColaboradoresWidgets extends StatefulWidget {
+  final String userID;
+  final String userName;
+  final String userEmail;
+  final String positionCompany;
+  final String phoneNumber;
+  final String userImageUrl;
+
+  const TodosColaboradoresWidgets(
+      {required this.userID,
+      required this.userName,
+      required this.userEmail,
+      required this.positionCompany,
+      required this.phoneNumber,
+      required this.userImageUrl});
+
   @override
   _TodosColaboradoresWidgetsState createState() =>
       _TodosColaboradoresWidgetsState();
@@ -27,12 +43,13 @@ class _TodosColaboradoresWidgetsState extends State<TodosColaboradoresWidgets> {
               backgroundColor: Colors.transparent,
               //https://cdn-icons-png.flaticon.com/512/1010/1010627.png
               radius: 20,
-              child: Image.network(
-                  'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+              child: Image.network(widget.userImageUrl == null
+                  ? 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
+                  : widget.userImageUrl),
             ),
           ),
           title: Text(
-            'Nombre Colaborador',
+            widget.userName,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -47,7 +64,7 @@ class _TodosColaboradoresWidgetsState extends State<TodosColaboradoresWidgets> {
                 color: Colors.grey.shade400,
               ),
               Text(
-                'Cargo actual - +595981 888825',
+                '${widget.positionCompany}- ${widget.phoneNumber}',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 15),
@@ -55,7 +72,9 @@ class _TodosColaboradoresWidgetsState extends State<TodosColaboradoresWidgets> {
             ],
           ),
           trailing: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              _mailto();
+            },
             icon: Icon(
               Icons.mail_outline,
               size: 30,
@@ -63,5 +82,16 @@ class _TodosColaboradoresWidgetsState extends State<TodosColaboradoresWidgets> {
             ),
           )),
     );
+  }
+
+  // Para enviar Correo
+  void _mailto() async {
+    var emailurl = 'mailto:${widget.userEmail}';
+    if (await canLaunch(emailurl)) {
+      await launch(emailurl);
+    } else {
+      print('Error');
+      throw 'Ah ocurrido un error';
+    }
   }
 }

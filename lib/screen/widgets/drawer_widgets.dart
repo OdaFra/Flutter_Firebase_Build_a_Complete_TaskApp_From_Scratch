@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/tareas_screen.dart';
-import 'package:flutter_firebase_app_workos/screen/todos_colaboradores.dart';
+import 'package:flutter_firebase_app_workos/screen/todos_usuarios.dart';
 import 'package:flutter_firebase_app_workos/screen/views/crear_tareas.dart';
 import 'package:flutter_firebase_app_workos/screen/views/perfil.dart';
 
@@ -62,7 +62,7 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
               },
               icon: Icons.settings),
           _listTiles(
-              label: 'Registrar Colaborador',
+              label: 'Todos los usuarios',
               fct: () {
                 _navigatorColaboradores(context);
               },
