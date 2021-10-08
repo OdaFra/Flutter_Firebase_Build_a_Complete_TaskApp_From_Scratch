@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/drawer_widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
 
 class CrearTareas extends StatefulWidget {
   @override
@@ -8,6 +12,7 @@ class CrearTareas extends StatefulWidget {
 }
 
 class _CrearTareasState extends State<CrearTareas> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   TextEditingController _categoriaTareaController =
       TextEditingController(text: 'Elija una categoria');
   TextEditingController _tituloTareaController = TextEditingController();
@@ -17,6 +22,8 @@ class _CrearTareasState extends State<CrearTareas> {
   final _fromKey = GlobalKey<FormState>();
 
   DateTime? picked;
+  bool _isLoading = false;
+  Timestamp? deadlineDateTimeStamp;
 
   @override
   void dispose() {
@@ -27,11 +34,44 @@ class _CrearTareasState extends State<CrearTareas> {
     _fechaTareaController.dispose();
   }
 
-  void _crearTareas() {
+  void _crearTareas() async {
+    final taksID = Uuid().v4();
+    User? user = _auth.currentUser;
+    final _uid = user!.uid;
     final isValid = _fromKey.currentState!.validate();
     // print(':Es Valido $isValid');
     if (isValid) {
-      print('Tarea guardada');
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await FirebaseFirestore.instance.collection('task').doc(taksID).set({
+          'taskID': taksID,
+          'uploadedBy': _uid,
+          'taskTitle': _tituloTareaController.text,
+          'taskDescription': _descripcionTareaController.text,
+          'deadlineDate': _fechaTareaController.text,
+          'deadlineDateTimeStamp': deadlineDateTimeStamp,
+          'taskCategory': _categoriaTareaController.text,
+          'taskComents': [],
+          'isDone': false,
+          'createAt': Timestamp.now(),
+        });
+        Fluttertoast.showToast(
+          msg: "Se ha agregado una tarea",
+          toastLength: Toast.LENGTH_LONG,
+          // gravity: ToastGravity.CENTER,
+          // timeInSecForIosWeb: 1,
+          // backgroundColor: Colors.red,
+          // textColor: Colors.white,
+          fontSize: 18.0,
+          backgroundColor: Colors.grey.shade700,
+        );
+      } catch (e) {} finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } else {
       print('Tarea NO guardada');
     }
@@ -124,36 +164,38 @@ class _CrearTareasState extends State<CrearTareas> {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 30),
-                    child: MaterialButton(
-                      color: Colors.green.shade300,
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      onPressed: _crearTareas,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Crear Tarea',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
+                    child: _isLoading
+                        ? CircularProgressIndicator()
+                        : MaterialButton(
+                            color: Colors.green.shade300,
+                            elevation: 8,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            onPressed: _crearTareas,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Crear Tarea',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
+                                  SizedBox(
+                                    width: 12,
+                                  ),
+                                  Icon(
+                                    Icons.upload_file_outlined,
+                                    color: Colors.white,
+                                  )
+                                ],
+                              ),
                             ),
-                            SizedBox(
-                              width: 12,
-                            ),
-                            Icon(
-                              Icons.upload_file_outlined,
-                              color: Colors.white,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
                   ),
                 )
               ],
@@ -228,6 +270,8 @@ class _CrearTareasState extends State<CrearTareas> {
       setState(() {
         _fechaTareaController.text =
             '${picked!.day}-${picked!.month}-${picked!.year}';
+        deadlineDateTimeStamp = Timestamp.fromMicrosecondsSinceEpoch(
+            picked!.microsecondsSinceEpoch);
       });
     }
   }

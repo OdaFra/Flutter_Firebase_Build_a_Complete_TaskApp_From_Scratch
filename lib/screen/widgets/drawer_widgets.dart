@@ -163,8 +163,12 @@ class _DrawerWidgetsState extends State<DrawerWidgets> {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     final User? user = _auth.currentUser;
     final String uid = user!.uid;
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => PerfilViews(userID: uid)));
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PerfilViews(userID: uid),
+      ),
+    );
   }
 
   void _navigatorColaboradores(context) {

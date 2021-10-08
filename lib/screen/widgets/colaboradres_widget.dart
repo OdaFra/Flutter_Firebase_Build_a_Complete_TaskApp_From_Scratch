@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
+import 'package:flutter_firebase_app_workos/screen/views/perfil.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TodosColaboradoresWidgets extends StatefulWidget {
@@ -30,7 +31,14 @@ class _TodosColaboradoresWidgetsState extends State<TodosColaboradoresWidgets> {
       elevation: 8,
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
-          onTap: () {},
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PerfilViews(userID: widget.userID),
+              ),
+            );
+          },
           contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           leading: Container(
             padding: EdgeInsets.only(right: 12),

@@ -18,6 +18,7 @@ class PerfilViews extends StatefulWidget {
 }
 
 class _PerfilViewsState extends State<PerfilViews> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   var _titletextStyle = TextStyle(
       fontSize: 18, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold);
 
@@ -43,31 +44,38 @@ class _PerfilViewsState extends State<PerfilViews> {
   bool _isSameUser = false;
 
   void getUserData() async {
-    _isLoading = true;
-    final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.userID)
-        .get();
-    if (userDoc == null) {
-      return;
-    } else {
-      setState(() {
-        email = userDoc.get('email');
-        name = userDoc.get('name');
-        job = userDoc.get('posicionCompany');
-        phoneNumber = userDoc.get('phoneNumber');
-        imageUrl = userDoc.get('userImage');
-        Timestamp joinedAtTimeStamp = userDoc.get('createAT');
-        var joinedDate = joinedAtTimeStamp.toDate();
-        joinedAt = '${joinedDate.day}/${joinedDate.month}/${joinedDate.year}';
-      });
+    try {
+      _isLoading = true;
+      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userID)
+          .get();
+      if (userDoc == null) {
+        return;
+      } else {
+        setState(() {
+          email = userDoc.get('email');
+          name = userDoc.get('name');
+          job = userDoc.get('posicionCompany');
+          phoneNumber = userDoc.get('phoneNumber');
+          imageUrl = userDoc.get('userImage');
+          Timestamp joinedAtTimeStamp = userDoc.get('createAT');
+          var joinedDate = joinedAtTimeStamp.toDate();
+          joinedAt = '${joinedDate.day}/${joinedDate.month}/${joinedDate.year}';
+        });
+        User? user = _auth.currentUser;
+        final _uid = user!.uid;
+        setState(() {
+          _isSameUser = _uid == widget.userID;
+        });
+      }
+    } catch (e) {} finally {
       _isLoading = false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       drawer: DrawerWidgets(),
@@ -148,87 +156,99 @@ class _PerfilViewsState extends State<PerfilViews> {
                           SizedBox(
                             height: 15,
                           ),
-                          Divider(
-                            thickness: 1,
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _contact(
-                                  color: Colors.green,
-                                  fct: () {
-                                    _openWhatsapp();
-                                  },
-                                  icon: FontAwesome.whatsapp),
-                              _contact(
-                                  color: Colors.orange,
-                                  fct: () {
-                                    _mailto();
-                                  },
-                                  icon: Icons.email_outlined),
-                              _contact(
-                                  color: Colors.blue,
-                                  fct: () {
-                                    _llamadaNumeroContacto();
-                                  },
-                                  icon: Icons.call_outlined),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Divider(
-                            thickness: 1,
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 30),
-                              child: MaterialButton(
-                                color: Colors.green.shade300,
-                                elevation: 8,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                onPressed: () {
-                                  _auth.signOut();
-                                  // Navigator.pop(context);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => UserState()));
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Cerrar Sesion',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                        Icons.login_outlined,
-                                        color: Colors.white,
-                                      )
-                                    ],
-                                  ),
+                          _isSameUser
+                              ? Container()
+                              : Divider(
+                                  thickness: 1,
                                 ),
-                              ),
-                            ),
-                          )
+                          SizedBox(
+                            height: 15,
+                          ),
+                          _isSameUser
+                              ? Container()
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    _contact(
+                                        color: Colors.green,
+                                        fct: () {
+                                          openWhatsapp();
+                                        },
+                                        icon: FontAwesome.whatsapp),
+                                    _contact(
+                                        color: Colors.orange,
+                                        fct: () {
+                                          _mailto();
+                                        },
+                                        icon: Icons.email_outlined),
+                                    _contact(
+                                        color: Colors.blue,
+                                        fct: () {
+                                          _llamadaNumeroContacto();
+                                        },
+                                        icon: Icons.call_outlined),
+                                  ],
+                                ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          !_isSameUser
+                              ? Container()
+                              : Divider(
+                                  thickness: 1,
+                                ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          !_isSameUser
+                              ? Container()
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 30),
+                                    child: MaterialButton(
+                                      color: Colors.green.shade300,
+                                      elevation: 8,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                      onPressed: () {
+                                        _auth.signOut();
+                                        // Navigator.pop(context);
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UserState()));
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 14),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Cerrar Sesion',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20),
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Icon(
+                                              Icons.login_outlined,
+                                              color: Colors.white,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
                         ],
                       ),
                     ),
@@ -262,7 +282,7 @@ class _PerfilViewsState extends State<PerfilViews> {
   }
 
 // Para Whatsapp
-  void _openWhatsapp() async {
+  void openWhatsapp() async {
     var url = 'https://wa.me/$phoneNumber?text=HolaMundo';
     if (await canLaunch(url)) {
       await launch(url);
