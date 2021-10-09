@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/drawer_widgets.dart';
@@ -47,9 +48,36 @@ class _TareasScreenState extends State<TareasScreen> {
               )),
         ],
       ),
-      body: ListView.builder(itemBuilder: (ctx, index) {
-        return TareasWidgets();
-      }),
+      body: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('task').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.data!.docs.isNotEmpty) {
+                return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (BuildContext context, index) {
+                      return TareasWidgets(
+                        taskId: snapshot.data!.docs[index]['taskID'],
+                        taskTitle: snapshot.data!.docs[index]['taskTitle'],
+                        taskDescription: snapshot.data!.docs[index]
+                            ['taskDescription'],
+                        taskuploadBy: snapshot.data!.docs[index]['uploadedBy'],
+                        isDone: snapshot.data!.docs[index]['isDone'],
+                      );
+                    });
+              } else {
+                return Center(child: Text('No se ha publicado tareas'));
+              }
+            }
+            return Center(
+              child: Text(
+                'Algo ha salido mal!',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
+            );
+          }),
     );
   }
 

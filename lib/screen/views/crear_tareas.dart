@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/drawer_widgets.dart';
+import 'package:flutter_firebase_app_workos/services/metodos_globales.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 
@@ -41,6 +42,12 @@ class _CrearTareasState extends State<CrearTareas> {
     final isValid = _fromKey.currentState!.validate();
     // print(':Es Valido $isValid');
     if (isValid) {
+      if (_fechaTareaController.text == 'Elija una fecha' ||
+          _categoriaTareaController.text == 'Elija una categoria') {
+        MetodoGlobal.showErrorDialog(
+            error: 'Por favor elija la fecha y la categoria ', ctx: context);
+        return;
+      }
       setState(() {
         _isLoading = true;
       });
@@ -58,15 +65,20 @@ class _CrearTareasState extends State<CrearTareas> {
           'createAt': Timestamp.now(),
         });
         Fluttertoast.showToast(
-          msg: "Se ha agregado una tarea",
-          toastLength: Toast.LENGTH_LONG,
-          // gravity: ToastGravity.CENTER,
-          // timeInSecForIosWeb: 1,
-          // backgroundColor: Colors.red,
-          // textColor: Colors.white,
-          fontSize: 18.0,
-          backgroundColor: Colors.grey.shade700,
-        );
+            msg: "Se ha agregado una tarea",
+            toastLength: Toast.LENGTH_LONG,
+            // gravity: ToastGravity.CENTER,
+            // timeInSecForIosWeb: 1,
+            // backgroundColor: Colors.red,
+            // textColor: Colors.white,
+            fontSize: 18.0,
+            backgroundColor: Colors.grey.shade700);
+        _tituloTareaController.clear();
+        _descripcionTareaController.clear();
+        setState(() {
+          _categoriaTareaController.text = 'Elija una categoria';
+          _fechaTareaController.text = 'Elija una fecha';
+        });
       } catch (e) {} finally {
         setState(() {
           _isLoading = false;

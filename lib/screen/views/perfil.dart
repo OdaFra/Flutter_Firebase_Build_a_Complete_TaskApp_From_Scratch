@@ -101,7 +101,7 @@ class _PerfilViewsState extends State<PerfilViews> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            height: 85,
+                            height: 105,
                           ),
                           Align(
                             alignment: Alignment.center,
