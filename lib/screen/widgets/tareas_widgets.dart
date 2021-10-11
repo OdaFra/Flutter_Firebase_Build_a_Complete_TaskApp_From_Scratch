@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/views/detalles_tareas.dart';
 import 'package:flutter_firebase_app_workos/services/metodos_globales.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class TareasWidgets extends StatefulWidget {
   final String taskTitle;
@@ -23,6 +25,7 @@ class TareasWidgets extends StatefulWidget {
 }
 
 class _TareasWidgetsState extends State<TareasWidgets> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -30,8 +33,13 @@ class _TareasWidgetsState extends State<TareasWidgets> {
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: ListTile(
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => DetallesTareasView()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DetallesTareasView(
+                        uploadedBy: widget.taskuploadBy,
+                        taskId: widget.taskId,
+                      )));
         },
         onLongPress: () => _eliminarDialog(),
         contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -84,6 +92,9 @@ class _TareasWidgetsState extends State<TareasWidgets> {
   }
 
   _eliminarDialog() {
+    User? user = _auth.currentUser;
+    final _uid = user!.uid;
+
     showDialog(
         context: context,
         builder: (ctx) {
@@ -92,11 +103,25 @@ class _TareasWidgetsState extends State<TareasWidgets> {
               TextButton(
                 onPressed: () async {
                   try {
-                    await FirebaseFirestore.instance
-                        .collection('task')
-                        .doc(widget.taskId)
-                        .delete();
-                    Navigator.canPop(ctx) ? Navigator.pop(ctx) : null;
+                    if (widget.taskuploadBy == _uid) {
+                      await FirebaseFirestore.instance
+                          .collection('task')
+                          .doc(widget.taskId)
+                          .delete();
+                      await Fluttertoast.showToast(
+                          msg: "La tarea fue eliminada",
+                          toastLength: Toast.LENGTH_LONG,
+                          // gravity: ToastGravity.CENTER,
+                          // timeInSecForIosWeb: 1,
+                          // backgroundColor: Colors.red,
+                          // textColor: Colors.white,
+                          fontSize: 18.0,
+                          backgroundColor: Colors.grey.shade700);
+                      Navigator.canPop(ctx) ? Navigator.pop(ctx) : null;
+                    } else {
+                      MetodoGlobal.showErrorDialog(
+                          error: 'No puede eliminar el registro', ctx: ctx);
+                    }
                   } catch (e) {
                     MetodoGlobal.showErrorDialog(
                         error: 'Esta tarea no la puede eliminar', ctx: context);

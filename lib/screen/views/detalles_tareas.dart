@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_firebase_app_workos/screen/constants/constants.dart';
 import 'package:flutter_firebase_app_workos/screen/widgets/comentarios.dart';
+import 'package:flutter_firebase_app_workos/services/metodos_globales.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
 
 class DetallesTareasView extends StatefulWidget {
+  final String uploadedBy;
+  final String taskId;
+  const DetallesTareasView({required this.uploadedBy, required this.taskId});
   @override
   _DetallesTareasViewState createState() => _DetallesTareasViewState();
 }
@@ -20,6 +28,64 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
   TextEditingController _comentarioController = TextEditingController();
 
   bool _isComentario = false;
+
+  String? authorName;
+  String? authorPosition;
+  String? taskCategory;
+  String? taskDescription;
+  String? taskTitle;
+
+  String? userImageUrl;
+  bool? _isDone;
+  Timestamp? postedDateTimeStamp;
+  Timestamp? deadlinDateTimeStamp;
+  String? postedDate;
+  String? deadlineDate;
+  bool isDeadlineAvailable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getTaskData();
+  }
+
+  void getTaskData() async {
+    final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.uploadedBy)
+        .get();
+    if (userDoc == null) {
+      return;
+    } else {
+      setState(() {
+        authorName = userDoc.get('name');
+        authorPosition = userDoc.get('posicionCompany');
+        userImageUrl = userDoc.get('userImage');
+      });
+    }
+    final DocumentSnapshot taskDatabase = await FirebaseFirestore.instance
+        .collection('task')
+        .doc(widget.taskId)
+        .get();
+    if (taskDatabase == null) {
+      return;
+    } else {
+      setState(() {
+        taskTitle = taskDatabase.get('taskTitle');
+        taskDescription = taskDatabase.get('taskDescription');
+        _isDone = taskDatabase.get('isDone');
+        postedDateTimeStamp = taskDatabase.get('createAt');
+        deadlinDateTimeStamp = taskDatabase.get('deadlineDateTimeStamp');
+        deadlineDate = taskDatabase.get('deadlineDate');
+        var postDate = postedDateTimeStamp!.toDate();
+        postedDate = '${postDate.day}-${postDate.month}-${postDate.year}';
+      });
+      var date = postedDateTimeStamp!.toDate();
+      isDeadlineAvailable = date.isAfter(DateTime.now());
+    }
+  }
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +113,7 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
           children: [
             SizedBox(height: 15),
             Text(
-              'Titulo',
+              taskTitle == null ? '' : taskTitle!,
               style: TextStyle(
                   color: Colors.green.shade400,
                   fontWeight: FontWeight.bold,
@@ -81,8 +147,9 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                               ),
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://cdn-icons-png.flaticon.com/512/149/149071.png'),
+                                  image: NetworkImage(userImageUrl == null
+                                      ? 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
+                                      : userImageUrl!),
                                   fit: BoxFit.fill),
                             ),
                           ),
@@ -92,8 +159,14 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Nombre : ', style: _textStyle),
-                              Text('Cargo : ', style: _textStyle)
+                              Text(
+                                authorName == null ? '' : authorName!,
+                                style: _textStyle,
+                              ),
+                              Text(
+                                authorPosition == null ? '' : authorPosition!,
+                                style: _textStyle,
+                              )
                             ],
                           ),
                         ],
@@ -104,7 +177,10 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                         children: [
                           Text('Publicado el :', style: _titStyle),
                           SizedBox(width: 3),
-                          Text(' 25/09/21', style: _textStyle),
+                          Text(
+                            postedDate == null ? '' : postedDate!,
+                            style: _textStyle,
+                          ),
                         ],
                       ),
                       SizedBox(height: 8),
@@ -113,7 +189,7 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                         children: [
                           Text('Fecha limite :', style: _titStyle),
                           SizedBox(width: 3),
-                          Text(' 25/10/21',
+                          Text(deadlineDate == null ? '' : deadlineDate!,
                               style: TextStyle(
                                   color: Colors.red.shade400,
                                   fontWeight: FontWeight.bold,
@@ -122,9 +198,14 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                       ),
                       SizedBox(height: 10),
                       Center(
-                        child: Text(' Todavia tienes tiempo',
+                        child: Text(
+                            isDeadlineAvailable
+                                ? ' El tiempo ya ha culminado'
+                                : ' Todavia tienes tiempo',
                             style: TextStyle(
-                                color: Colors.green.shade600,
+                                color: isDeadlineAvailable
+                                    ? Colors.red.shade600
+                                    : Colors.green.shade600,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15)),
                       ),
@@ -134,7 +215,28 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                       Row(
                         children: [
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              User? user = _auth.currentUser;
+                              final _uid = user!.uid;
+                              if (_uid == widget.uploadedBy) {
+                                try {
+                                  FirebaseFirestore.instance
+                                      .collection('task')
+                                      .doc(widget.taskId)
+                                      .update({'isDone': true});
+                                } catch (e) {
+                                  MetodoGlobal.showErrorDialog(
+                                      error:
+                                          'La accion fue realizada con exito!',
+                                      ctx: context);
+                                }
+                              } else {
+                                MetodoGlobal.showErrorDialog(
+                                    error: 'No puedes realizar esta acción',
+                                    ctx: context);
+                              }
+                              getTaskData();
+                            },
                             child: Text(
                               'Hecho ',
                               style: TextStyle(
@@ -147,7 +249,7 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                             ),
                           ),
                           Opacity(
-                            opacity: 1,
+                            opacity: _isDone == true ? 1 : 0,
                             child: Icon(
                               Icons.check_box,
                               color: Colors.green.shade400,
@@ -155,7 +257,28 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                           ),
                           SizedBox(width: 40),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              User? user = _auth.currentUser;
+                              final _uid = user!.uid;
+                              if (_uid == widget.uploadedBy) {
+                                try {
+                                  FirebaseFirestore.instance
+                                      .collection('task')
+                                      .doc(widget.taskId)
+                                      .update({'isDone': false});
+                                } catch (e) {
+                                  MetodoGlobal.showErrorDialog(
+                                      error:
+                                          'La accion fue realizada con exito!',
+                                      ctx: context);
+                                }
+                              } else {
+                                MetodoGlobal.showErrorDialog(
+                                    error: 'No puedes realizar esta acción',
+                                    ctx: context);
+                              }
+                              getTaskData();
+                            },
                             child: Text(
                               'No hecho ',
                               style: TextStyle(
@@ -168,7 +291,7 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                             ),
                           ),
                           Opacity(
-                            opacity: 0,
+                            opacity: _isDone == false ? 1 : 0,
                             child: Icon(
                               Icons.check_box,
                               color: Colors.red.shade400,
@@ -178,7 +301,11 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                       ),
                       _dividerWidget(),
                       Text('Detalle Tarea :', style: _titStyle),
-                      Text('Descripcion : ', style: _textStyle),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(taskDescription == null ? ' ' : taskDescription!,
+                          style: _textStyle),
                       SizedBox(
                         height: 40,
                       ),
@@ -227,7 +354,51 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(8)),
-                                          onPressed: () {},
+                                          onPressed: () async {
+                                            if (_comentarioController
+                                                    .text.length <
+                                                7) {
+                                              MetodoGlobal.showErrorDialog(
+                                                  error:
+                                                      'Por favor ingrese un comentario con mas de 7 caracteres',
+                                                  ctx: context);
+                                            } else {
+                                              final _generatedId = Uuid().v4();
+                                              await FirebaseFirestore.instance
+                                                  .collection('task')
+                                                  .doc(widget.taskId)
+                                                  .update({
+                                                'taskComents':
+                                                    FieldValue.arrayUnion([
+                                                  {
+                                                    'userId': widget.uploadedBy,
+                                                    'commentId': _generatedId,
+                                                    'name': authorName,
+                                                    'userImageUrl':
+                                                        userImageUrl,
+                                                    'commentBody':
+                                                        _comentarioController
+                                                            .text,
+                                                    'time': Timestamp.now()
+                                                  }
+                                                ])
+                                              });
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                      "Se ha agregado su comentario",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  // gravity: ToastGravity.CENTER,
+                                                  // timeInSecForIosWeb: 1,
+                                                  // backgroundColor: Colors.red,
+                                                  // textColor: Colors.white,
+                                                  fontSize: 18.0,
+                                                  backgroundColor:
+                                                      Colors.grey.shade700);
+                                              _comentarioController.clear();
+                                            }
+                                            setState(() {});
+                                          },
                                           child: Text(
                                             'Post',
                                             style: TextStyle(
@@ -274,16 +445,49 @@ class _DetallesTareasViewState extends State<DetallesTareasView> {
                               ),
                       ),
                       SizedBox(height: 40),
-                      ListView.separated(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return ComentariosViews();
-                          },
-                          separatorBuilder: (context, index) {
-                            return Divider(thickness: 1);
-                          },
-                          itemCount: 15)
+                      FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance
+                              .collection('task')
+                              .doc(widget.taskId)
+                              .get(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              if (snapshot.data == null) {
+                                return Center(
+                                  child: Text(
+                                      'No posee ningun comentario esta tarea'),
+                                );
+                              }
+                            }
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return ComentariosViews(
+                                  commentId: snapshot.data!['taskComents']
+                                      [index]['commentId'],
+                                  commenterId: snapshot.data!['taskComents']
+                                      [index]['userId'],
+                                  commentBody: snapshot.data!['taskComents']
+                                      [index]['commentBody'],
+                                  commenterImageUrl:
+                                      snapshot.data!['taskComents'][index]
+                                          ['userImageUrl'],
+                                  commenterName: snapshot.data!['taskComents']
+                                      [index]['name'],
+                                );
+                              },
+                              separatorBuilder: (context, index) {
+                                return Divider(thickness: 1);
+                              },
+                              itemCount: snapshot.data!['taskComents'].length,
+                            );
+                          })
                     ],
                   ),
                 ),

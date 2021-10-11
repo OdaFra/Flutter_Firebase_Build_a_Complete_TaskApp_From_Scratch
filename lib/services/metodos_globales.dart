@@ -24,7 +24,7 @@ class MetodoGlobal {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: const Text(
-                    'El usuario ya existe!',
+                    'Mensaje',
                     style: TextStyle(fontSize: 18),
                   ),
                 )
