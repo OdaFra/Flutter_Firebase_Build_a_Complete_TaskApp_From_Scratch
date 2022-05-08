@@ -69,7 +69,8 @@ class _PerfilViewsState extends State<PerfilViews> {
           _isSameUser = _uid == widget.userID;
         });
       }
-    } catch (e) {} finally {
+    } catch (e) {
+    } finally {
       _isLoading = false;
     }
   }

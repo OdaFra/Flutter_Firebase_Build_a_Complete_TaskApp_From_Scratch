@@ -568,7 +568,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     // setState(() {
     //   imageFile = File(pickedFile!.path);
     // });
-    _cropImage(pickedFile!.path);
+    cropImage(pickedFile!.path);
     Navigator.pop(context);
   }
 
@@ -581,12 +581,12 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
     // setState(() {
     //   imageFile = File(pickedFile!.path);
     // });
-    _cropImage(pickedFile!.path);
+    cropImage(pickedFile!.path);
     Navigator.pop(context);
   }
 
-  void _cropImage(filePath) async {
-    File? croppedImage = await ImageCropper.cropImage(
+  void cropImage(filePath) async {
+    File? croppedImage = await ImageCropper().cropImage(
       sourcePath: filePath,
       maxHeight: 1080,
       maxWidth: 1080,

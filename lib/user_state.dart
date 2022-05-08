@@ -16,13 +16,6 @@ class UserState extends StatelessWidget {
             print('El usuario ya ha iniciado sesion!');
             return TareasScreen();
           } else if (userSnapshot.hasError) {
-            return Scaffold(
-              body: Center(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            );
           } else if (userSnapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
               body: Center(
